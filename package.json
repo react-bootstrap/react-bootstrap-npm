@@ -1,6 +1,6 @@
 {
   "name": "react-bootstrap",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Bootstrap 3 components build with React",
   "main": "main.js",
   "keywords": [
@@ -10,6 +10,6 @@
   "author": "Stephen J. Collings <stevoland@gmail.com>",
   "license": "MIT",
   "peerDependencies": {
-    "react": "~0.8"
+    "react": "~0.9"
   }
 }
