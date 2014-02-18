@@ -21,7 +21,7 @@ npm install react-bootstrap
 var Alert = require('react-bootstrap/cjs/Alert');
 // or
 var Alert = require('react-bootstrap').Alert;
-
+```
 
 ## Currently implemented (but under active development)
 
