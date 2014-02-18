@@ -10,10 +10,13 @@ The source repo is [here](https://github.com/stevoland/react-bootstrap).
 
 ## Getting started
 
+NOTE: Requires the latest React: 0.9.0-alpha. Get the build from my
+build for npm `npm install git://github.com/stevoland/react-with-test-utils`
+
 First add the bootstrap CSS to your project then
 
 ```
-npm install react react-bootstrap
+npm install react-bootstrap
 
 var Alert = require('react-bootstrap/cjs/Alert');
 // or
@@ -26,8 +29,7 @@ var Alert = require('react-bootstrap').Alert;
 - [Button](#Button)
 - [DropdownButton](#DropdownButton)
 - [MenuItem](#MenuItem)
-- [TabbedArea, TabPane, Tab](#Tabs)
-- [CollapsePanel](#CollapsePanel)
+- [TabbedArea, TabPane](#Tabs)
 - [Alert](#Alert)
 - SplitButton
 
@@ -115,12 +117,6 @@ function handleDismiss () {
   <strong>Oh snap!</strong> Change a few things up and try submitting again.
 </Alert>
 ```
-
-### <a name="CollapsePanel"></a>CollapsePanel
-
-`var CollapsePanel = require('react-bootstrap/cjs/CollapsePanel')`
-
-TODO docs
 
 ### <a name="MenuItem"></a>MenuItem
 
