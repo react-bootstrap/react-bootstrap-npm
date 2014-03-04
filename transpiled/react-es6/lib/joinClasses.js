@@ -14,26 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @providesModule invariant
+ * @providesModule joinClasses
+ * @typechecks static-only
  */
+
+"use strict";
 
 /**
- * Use invariant() to assert state which your program assumes to be true.
+ * Combines multiple className strings into one.
+ * http://jsperf.com/joinclasses-args-vs-array
  *
- * Provide sprintf-style format (only %s is supported) and arguments
- * to provide information about what broke and what you were
- * expecting.
- *
- * The invariant message will be stripped in production, but the invariant
- * will remain to ensure logic does not differ in production.
+ * @param {...?string} classes
+ * @return {string}
  */
-
-function invariant(condition) {
-  if (!condition) {
-    var error = new Error('Invariant Violation');
-    error.framesToPop = 1;
-    throw error;
+function joinClasses (className/*, ... */) {
+  if (!className) {
+    className = '';
   }
+  var nextClass;
+  var argLength = arguments.length;
+  if (argLength > 1) {
+    for (var ii = 1; ii < argLength; ii++) {
+      nextClass = arguments[ii];
+      nextClass && (className += ' ' + nextClass);
+    }
+  }
+  return className;
 }
 
-exports["default"] = invariant;
+exports["default"] = joinClasses;

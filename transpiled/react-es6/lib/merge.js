@@ -14,32 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @providesModule joinClasses
- * @typechecks static-only
+ * @providesModule merge
  */
 
 "use strict";
 
-/**
- * Combines multiple className strings into one.
- * http://jsperf.com/joinclasses-args-vs-array
- *
- * @param {...?string} classes
- * @return {string}
- */
-function joinClasses(className/*, ... */) {
-  if (!className) {
-    className = '';
-  }
-  var nextClass;
-  var argLength = arguments.length;
-  if (argLength > 1) {
-    for (var ii = 1; ii < argLength; ii++) {
-      nextClass = arguments[ii];
-      nextClass && (className += ' ' + nextClass);
-    }
-  }
-  return className;
-}
+var mergeInto = require("./mergeInto")["default"];
 
-exports["default"] = joinClasses;
+/**
+ * Shallow merges two structures into a return value, without mutating either.
+ *
+ * @param {?object} one Optional object with properties to merge from.
+ * @param {?object} two Optional object with properties to merge from.
+ * @return {object} The shallow extension of one by two.
+ */
+var merge = function (one, two) {
+  var result = {};
+  mergeInto(result, one);
+  mergeInto(result, two);
+  return result;
+};
+
+exports["default"] = merge;
