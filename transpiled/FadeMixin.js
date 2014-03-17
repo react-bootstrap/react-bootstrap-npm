@@ -29,9 +29,7 @@ exports["default"] = {
   },
 
   _handleFadeOutEnd: function () {
-    if (this._fadeOutEl && this._fadeOutEl.parentNode) {
-      this._fadeOutEl.parentNode.removeChild(this._fadeOutEl);
-    }
+    this._fadeOutEl.parentNode.removeChild(this._fadeOutEl);
   },
 
   componentDidMount: function () {
