@@ -11,7 +11,7 @@ var Nav = React.createClass({displayName: 'Nav',
   mixins: [BootstrapMixin],
 
   propTypes: {
-    bsStyle: React.PropTypes.oneOf(['tabs','pills']).isRequired,
+    bsStyle: React.PropTypes.oneOf(['tabs','pills']),
     stacked: React.PropTypes.bool,
     justified: React.PropTypes.bool,
     onSelect: React.PropTypes.func
@@ -38,11 +38,31 @@ var Nav = React.createClass({displayName: 'Nav',
     );
   },
 
+  getChildActiveProp: function (child) {
+    if (child.props.active) {
+      return true;
+    }
+    if (this.props.activeKey != null) {
+      if (child.props.key === this.props.activeKey) {
+        return true;
+      }
+    }
+    if (this.props.activeHref != null) {
+      if (child.props.href === this.props.activeHref) {
+        return true;
+      }
+    }
+
+    return child.props.active;
+  },
+
   renderNavItem: function (child) {
     return utils.cloneWithProps(
       child,
       {
-        isActive: this.props.activeKey != null ? child.props.key === this.props.activeKey : null,
+        active: this.getChildActiveProp(child),
+        activeKey: this.props.activeKey,
+        activeHref: this.props.activeHref,
         onSelect: utils.createChainedFunction(child.onSelect, this.props.onSelect),
         ref: child.props.ref,
         key: child.props.key
