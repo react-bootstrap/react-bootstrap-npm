@@ -1,12 +1,10 @@
 "use strict";
 /** @jsx React.DOM */
-/* global document */
 
 var React = require("./react-es6")["default"];
 var classSet = require("./react-es6/lib/cx")["default"];
 var BootstrapMixin = require("./BootstrapMixin")["default"];
 var DropdownStateMixin = require("./DropdownStateMixin")["default"];
-var utils = require("./utils")["default"];
 var Button = require("./Button")["default"];
 var ButtonGroup = require("./ButtonGroup")["default"];
 var DropdownMenu = require("./DropdownMenu")["default"];
@@ -15,7 +13,7 @@ var SplitButton = React.createClass({displayName: 'SplitButton',
   mixins: [BootstrapMixin, DropdownStateMixin],
 
   propTypes: {
-    pullRight:         React.PropTypes.bool,
+    pullRight:     React.PropTypes.bool,
     title:         React.PropTypes.renderable,
     href:          React.PropTypes.string,
     dropdownTitle: React.PropTypes.renderable,
@@ -38,7 +36,8 @@ var SplitButton = React.createClass({displayName: 'SplitButton',
     return (
       ButtonGroup(
         {bsSize:this.props.bsSize,
-        className:classSet(groupClasses)}, 
+        className:classSet(groupClasses),
+        id:this.props.id}, 
         Button(
           {ref:"button",
           href:this.props.href,
