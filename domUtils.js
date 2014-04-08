@@ -1,2 +1,2 @@
-var domUtils = require('./transpiled/domUtils').default;
+var domUtils = require('./transpiled/domUtils')['default'];
 module.exports = domUtils

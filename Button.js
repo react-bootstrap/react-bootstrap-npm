@@ -1,2 +1,2 @@
-var Button = require('./transpiled/Button').default;
+var Button = require('./transpiled/Button')['default'];
 module.exports = Button

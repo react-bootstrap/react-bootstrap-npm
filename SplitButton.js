@@ -1,2 +1,2 @@
-var SplitButton = require('./transpiled/SplitButton').default;
+var SplitButton = require('./transpiled/SplitButton')['default'];
 module.exports = SplitButton

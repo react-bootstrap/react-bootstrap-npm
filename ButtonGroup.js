@@ -1,2 +1,2 @@
-var ButtonGroup = require('./transpiled/ButtonGroup').default;
+var ButtonGroup = require('./transpiled/ButtonGroup')['default'];
 module.exports = ButtonGroup

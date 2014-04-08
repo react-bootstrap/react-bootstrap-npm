@@ -1,2 +1,2 @@
-var Nav = require('./transpiled/Nav').default;
+var Nav = require('./transpiled/Nav')['default'];
 module.exports = Nav

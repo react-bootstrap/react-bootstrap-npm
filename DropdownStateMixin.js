@@ -1,2 +1,2 @@
-var DropdownStateMixin = require('./transpiled/DropdownStateMixin').default;
+var DropdownStateMixin = require('./transpiled/DropdownStateMixin')['default'];
 module.exports = DropdownStateMixin

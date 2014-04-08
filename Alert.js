@@ -1,2 +1,2 @@
-var Alert = require('./transpiled/Alert').default;
+var Alert = require('./transpiled/Alert')['default'];
 module.exports = Alert

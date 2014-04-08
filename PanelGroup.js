@@ -1,2 +1,2 @@
-var PanelGroup = require('./transpiled/PanelGroup').default;
+var PanelGroup = require('./transpiled/PanelGroup')['default'];
 module.exports = PanelGroup

@@ -1,2 +1,2 @@
-var NavItem = require('./transpiled/NavItem').default;
+var NavItem = require('./transpiled/NavItem')['default'];
 module.exports = NavItem

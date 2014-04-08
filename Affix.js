@@ -1,2 +1,2 @@
-var Affix = require('./transpiled/Affix').default;
+var Affix = require('./transpiled/Affix')['default'];
 module.exports = Affix

@@ -1,2 +1,2 @@
-var constants = require('./transpiled/constants').default;
+var constants = require('./transpiled/constants')['default'];
 module.exports = constants

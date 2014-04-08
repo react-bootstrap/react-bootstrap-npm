@@ -1,2 +1,2 @@
-var DropdownMenu = require('./transpiled/DropdownMenu').default;
+var DropdownMenu = require('./transpiled/DropdownMenu')['default'];
 module.exports = DropdownMenu

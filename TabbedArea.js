@@ -1,2 +1,2 @@
-var TabbedArea = require('./transpiled/TabbedArea').default;
+var TabbedArea = require('./transpiled/TabbedArea')['default'];
 module.exports = TabbedArea

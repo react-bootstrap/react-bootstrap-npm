@@ -1,2 +1,2 @@
-var TabPane = require('./transpiled/TabPane').default;
+var TabPane = require('./transpiled/TabPane')['default'];
 module.exports = TabPane
