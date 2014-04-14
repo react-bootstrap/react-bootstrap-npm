@@ -15,6 +15,13 @@ var FadeMixin = require("./FadeMixin")["default"];
 var Modal = React.createClass({displayName: 'Modal',
   mixins: [BootstrapMixin, FadeMixin],
 
+  propTypes: {
+    title: React.PropTypes.renderable,
+    backdrop: React.PropTypes.oneOf(['static', true, false]),
+    keyboard: React.PropTypes.bool,
+    onRequestHide: React.PropTypes.func.isRequired
+  },
+
   getDefaultProps: function () {
     return {
       bsClass: 'modal',
@@ -24,29 +31,8 @@ var Modal = React.createClass({displayName: 'Modal',
     };
   },
 
-  componentDidMount: function () {
-    document.addEventListener('keyup', this.handleKeyUp);
-  },
-
-  componentWillUnmount: function () {
-    document.removeEventListener('keyup', this.handleKeyUp);
-  },
-
-  killClick: function (e) {
-    e.stopPropagation();
-  },
-
-  handleBackdropClick: function () {
-    this.props.onRequestHide();
-  },
-
-  handleKeyUp: function (e) {
-    if (this.props.keyboard && e.keyCode === 27) {
-      this.props.onRequestHide();
-    }
-  },
-
   render: function () {
+    var modalStyle = {display: 'block'};
     var classes = this.getBsClassSet();
 
     classes['fade'] = this.props.animation;
@@ -54,16 +40,14 @@ var Modal = React.createClass({displayName: 'Modal',
 
     var modal = this.transferPropsTo(
       React.DOM.div(
-        {bsClass:"modal",
-        tabIndex:"-1",
+        {tabIndex:"-1",
         role:"dialog",
-        style:{display: 'block'},
+        style:modalStyle,
         className:classSet(classes),
-        onClick:this.handleBackdropClick,
-        ref:"modal"}
-      , 
+        onClick:this.props.backdrop === true ? this.handleBackdropClick : null,
+        ref:"modal"}, 
         React.DOM.div( {className:"modal-dialog"}, 
-          React.DOM.div( {className:"modal-content", onClick:this.killClick}, 
+          React.DOM.div( {className:"modal-content"}, 
             this.props.title ? this.renderHeader() : null,
             this.props.children
           )
@@ -105,6 +89,28 @@ var Modal = React.createClass({displayName: 'Modal',
       React.isValidComponent(this.props.title) ?
         this.props.title : React.DOM.h4( {className:"modal-title"}, this.props.title)
     );
+  },
+
+  componentDidMount: function () {
+    document.addEventListener('keyup', this.handleDocumentKeyUp);
+  },
+
+  componentWillUnmount: function () {
+    document.removeEventListener('keyup', this.handleDocumentKeyUp);
+  },
+
+  handleBackdropClick: function (e) {
+    if (e.target !== e.currentTarget) {
+      return;
+    }
+
+    this.props.onRequestHide();
+  },
+
+  handleDocumentKeyUp: function (e) {
+    if (this.props.keyboard && e.keyCode === 27) {
+      this.props.onRequestHide();
+    }
   }
 });
 
