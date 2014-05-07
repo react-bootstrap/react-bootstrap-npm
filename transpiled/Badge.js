@@ -2,13 +2,12 @@
 /** @jsx React.DOM */
 
 var React = require("./react-es6")["default"];
-var classSet = require("./react-es6/lib/cx")["default"];
 
 var Badge = React.createClass({displayName: 'Badge',
 
   render: function () {
     return this.transferPropsTo(
-      React.DOM.span( {className:"badge"}, 
+      React.DOM.span( {className:this.props.children ? 'badge': null}, 
         this.props.children
       )
     );
