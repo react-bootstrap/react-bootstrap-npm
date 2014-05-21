@@ -4,17 +4,22 @@
 var React = require("./react-es6")["default"];
 var classSet = require("./react-es6/lib/cx")["default"];
 var BootstrapMixin = require("./BootstrapMixin")["default"];
+var CollapsableMixin = require("./CollapsableMixin")["default"];
 var utils = require("./utils")["default"];
+var domUtils = require("./domUtils")["default"];
 
 
 var Nav = React.createClass({displayName: 'Nav',
-  mixins: [BootstrapMixin],
+  mixins: [BootstrapMixin, CollapsableMixin],
 
   propTypes: {
     bsStyle: React.PropTypes.oneOf(['tabs','pills']),
     stacked: React.PropTypes.bool,
     justified: React.PropTypes.bool,
-    onSelect: React.PropTypes.func
+    onSelect: React.PropTypes.func,
+    isCollapsable: React.PropTypes.bool,
+    isOpen: React.PropTypes.bool,
+    navbar: React.PropTypes.bool
   },
 
   getDefaultProps: function () {
@@ -23,17 +28,44 @@ var Nav = React.createClass({displayName: 'Nav',
     };
   },
 
+  getCollapsableDOMNode: function () {
+    return this.getDOMNode();
+  },
+
+  getCollapsableDimensionValue: function () {
+    var node = this.refs.ul.getDOMNode(),
+        height = node.offsetHeight,
+        computedStyles = domUtils.getComputedStyles(node);
+
+    return height + parseInt(computedStyles.marginTop, 10) + parseInt(computedStyles.marginBottom, 10);
+  },
+
   render: function () {
+    var classes = this.props.isCollapsable ? this.getCollapsableClassSet() : {};
+
+    classes['navbar-collapse'] = this.props.isCollapsable;
+
+    if (this.props.navbar) {
+      return this.renderUl();
+    }
+
+    return this.transferPropsTo(
+      React.DOM.nav( {className:classSet(classes)}, 
+        this.renderUl()
+      )
+    );
+  },
+
+  renderUl: function () {
     var classes = this.getBsClassSet();
 
     classes['nav-stacked'] = this.props.stacked;
     classes['nav-justified'] = this.props.justified;
+    classes['navbar-nav'] = this.props.navbar;
 
-    return this.transferPropsTo(
-      React.DOM.nav(null, 
-        React.DOM.ul( {className:classSet(classes)}, 
-          utils.modifyChildren(this.props.children, this.renderNavItem)
-        )
+    return (
+      React.DOM.ul( {className:classSet(classes), ref:"ul"}, 
+        utils.modifyChildren(this.props.children, this.renderNavItem)
       )
     );
   },
@@ -65,7 +97,8 @@ var Nav = React.createClass({displayName: 'Nav',
         activeHref: this.props.activeHref,
         onSelect: utils.createChainedFunction(child.props.onSelect, this.props.onSelect),
         ref: child.props.ref,
-        key: child.props.key
+        key: child.props.key,
+        navItem: true
       }
     );
   }

@@ -11,7 +11,9 @@ var Button = React.createClass({displayName: 'Button',
   propTypes: {
     active:   React.PropTypes.bool,
     disabled: React.PropTypes.bool,
-    block:    React.PropTypes.bool
+    block:    React.PropTypes.bool,
+    navItem:    React.PropTypes.bool,
+    navDropdown: React.PropTypes.bool
   },
 
   getDefaultProps: function () {
@@ -23,22 +25,30 @@ var Button = React.createClass({displayName: 'Button',
   },
 
   render: function () {
-    var classes = this.getBsClassSet();
+    var classes = this.props.navDropdown ? {} : this.getBsClassSet();
+    var renderFuncName;
+
     classes['active'] = this.props.active;
     classes['btn-block'] = this.props.block;
 
-    var renderFuncName = this.props.href ?
+    if (this.props.navItem) {
+      return this.renderNavItem(classes);
+    }
+
+    renderFuncName = this.props.href || this.props.navDropdown ?
       'renderAnchor' : 'renderButton';
 
     return this[renderFuncName](classes);
   },
 
   renderAnchor: function (classes) {
+    var href = this.props.href || '#';
     classes['disabled'] = this.props.disabled;
 
     return this.transferPropsTo(
       React.DOM.a(
-        {className:classSet(classes),
+        {href:href,
+        className:classSet(classes),
         role:"button"}, 
         this.props.children
       )
@@ -50,6 +60,18 @@ var Button = React.createClass({displayName: 'Button',
       React.DOM.button(
         {className:classSet(classes)}, 
         this.props.children
+      )
+    );
+  },
+
+  renderNavItem: function (classes) {
+    var liClasses = {
+      active: this.props.active
+    };
+
+    return (
+      React.DOM.li( {className:classSet(liClasses)}, 
+        this.renderAnchor(classes)
       )
     );
   }

@@ -5,6 +5,8 @@ var React = require("./react-es6")["default"];
 var classSet = require("./react-es6/lib/cx")["default"];
 var BootstrapMixin = require("./BootstrapMixin")["default"];
 var PropTypes = require("./PropTypes")["default"];
+var utils = require("./utils")["default"];
+var Nav = require("./Nav")["default"];
 
 
 var Navbar = React.createClass({displayName: 'Navbar',
@@ -16,7 +18,11 @@ var Navbar = React.createClass({displayName: 'Navbar',
     staticTop: React.PropTypes.bool,
     inverse: React.PropTypes.bool,
     role: React.PropTypes.string,
-    componentClass: PropTypes.componentClass
+    componentClass: PropTypes.componentClass,
+    brand: React.PropTypes.renderable,
+    toggleButton: React.PropTypes.renderable,
+    onToggle: React.PropTypes.func,
+    fluid: React.PropTypes.func
   },
 
   getDefaultProps: function () {
@@ -26,6 +32,33 @@ var Navbar = React.createClass({displayName: 'Navbar',
       role: 'navigation',
       componentClass: React.DOM.nav
     };
+  },
+
+  getInitialState: function () {
+    return {
+      navOpen: this.props.defaultNavOpen
+    };
+  },
+
+  shouldComponentUpdate: function() {
+    // Defer any updates to this component during the `onSelect` handler.
+    return !this._isChanging;
+  },
+
+  handleToggle: function () {
+    if (this.props.onToggle) {
+      this._isChanging = true;
+      this.props.onToggle();
+      this._isChanging = false;
+    }
+
+    this.setState({
+      navOpen: !this.state.navOpen
+    });
+  },
+
+  isNavOpen: function () {
+    return this.props.navOpen != null ? this.props.navOpen : this.state.navOpen;
   },
 
   render: function () {
@@ -38,8 +71,64 @@ var Navbar = React.createClass({displayName: 'Navbar',
     classes['navbar-inverse'] = this.props.inverse;
 
     return this.transferPropsTo(
-      componentClass( {className:classSet(classes), role:this.props.role}, 
-        this.props.children
+      componentClass( {className:classSet(classes)}, 
+        React.DOM.div( {className:this.props.fluid ? 'container-fluid' : 'container'}, 
+          (this.props.brand || this.props.toggleButton || this.props.toggleNavKey) ? this.renderHeader() : null,
+          React.Children.map(this.props.children, this.renderChild)
+        )
+      )
+    );
+  },
+
+  renderChild: function (child) {
+    return utils.cloneWithProps(child, {
+      navbar: true,
+      isCollapsable: this.props.toggleNavKey != null && this.props.toggleNavKey === child.props.key,
+      isOpen: this.props.toggleNavKey != null && this.props.toggleNavKey === child.props.key && this.isNavOpen(),
+      key: child.props.key,
+      ref: child.props.ref
+    });
+  },
+
+  renderHeader: function () {
+    var brand;
+
+    if (this.props.brand) {
+      brand = React.isValidComponent(this.props.brand) ?
+        utils.cloneWithProps(this.props.brand, {
+          className: 'navbar-brand'
+        }) : React.DOM.span( {className:"navbar-brand"}, this.props.brand);
+    }
+
+    return (
+      React.DOM.div( {className:"navbar-header"}, 
+        brand,
+        (this.props.toggleButton || this.props.toggleNavKey != null) ? this.renderToggleButton() : null
+      )
+    );
+  },
+
+  renderToggleButton: function () {
+    var children;
+
+    if (React.isValidComponent(this.props.toggleButton)) {
+      return utils.cloneWithProps(this.props.toggleButton, {
+        className: 'navbar-toggle',
+        onClick: utils.createChainedFunction(this.handleToggle, this.props.toggleButton.props.onClick)
+      });
+    }
+
+    children = (this.props.toggleButton != null) ?
+      this.props.toggleButton : [
+        React.DOM.span( {className:"sr-only", key:0}, "Toggle navigation"),
+        React.DOM.span( {className:"icon-bar", key:1}),
+        React.DOM.span( {className:"icon-bar", key:2}),
+        React.DOM.span( {className:"icon-bar", key:3})
+    ];
+
+    return (
+      React.DOM.button( {className:"navbar-toggle", type:"button", onClick:this.handleToggle}, 
+        children
       )
     );
   }
