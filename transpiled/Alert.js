@@ -28,7 +28,7 @@ var Alert = React.createClass({displayName: 'Alert',
         className:"close",
         onClick:this.props.onDismiss,
         'aria-hidden':"true"}, 
-        "×"
+        " × "
       )
     );
   },

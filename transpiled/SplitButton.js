@@ -42,7 +42,7 @@ var SplitButton = React.createClass({displayName: 'SplitButton',
           {ref:"button",
           href:this.props.href,
           bsStyle:this.props.bsStyle,
-          onClick:this.props.onClick}, 
+          onClick:this.handleButtonClick}, 
           this.props.title
         ),
 
@@ -50,7 +50,7 @@ var SplitButton = React.createClass({displayName: 'SplitButton',
           {ref:"dropdownButton",
           bsStyle:this.props.bsStyle,
           className:"dropdown-toggle",
-          onClick:this.handleOpenClick}, 
+          onClick:this.handleDropdownClick}, 
           React.DOM.span( {className:"sr-only"}, this.props.dropdownTitle),
           React.DOM.span( {className:"caret"} )
         ),
@@ -66,10 +66,20 @@ var SplitButton = React.createClass({displayName: 'SplitButton',
     );
   },
 
-  handleOpenClick: function (e) {
+  handleButtonClick: function (e) {
+    if (this.state.open) {
+      this.setDropdownState(false);
+    }
+
+    if (this.props.onClick) {
+      this.props.onClick(e);
+    }
+  },
+
+  handleDropdownClick: function (e) {
     e.preventDefault();
 
-    this.setDropdownState(true);
+    this.setDropdownState(!this.state.open);
   },
 
   handleOptionSelect: function (key) {
