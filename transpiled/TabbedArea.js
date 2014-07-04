@@ -6,33 +6,42 @@ var BootstrapMixin = require("./BootstrapMixin")["default"];
 var utils = require("./utils")["default"];
 var Nav = require("./Nav")["default"];
 var NavItem = require("./NavItem")["default"];
+var ValidComponentChildren = require("./ValidComponentChildren")["default"];
 
-function hasTab (child) {
-  return !!child.props.tab;
+function getDefaultActiveKeyFromChildren(children) {
+  var defaultActiveKey;
+
+  ValidComponentChildren.forEach(children, function(child) {
+    if (defaultActiveKey == null) {
+      defaultActiveKey = child.props.key;
+    }
+  });
+
+  return defaultActiveKey;
 }
 
 var TabbedArea = React.createClass({displayName: 'TabbedArea',
   mixins: [BootstrapMixin],
 
   propTypes: {
+    bsStyle: React.PropTypes.oneOf(['tabs','pills']),
     animation: React.PropTypes.bool,
     onSelect: React.PropTypes.func
   },
 
   getDefaultProps: function () {
     return {
+      bsStyle: "tabs",
       animation: true
     };
   },
 
   getInitialState: function () {
-    var defaultActiveKey = this.props.defaultActiveKey;
+    var defaultActiveKey = this.props.defaultActiveKey != null ?
+      this.props.defaultActiveKey : getDefaultActiveKeyFromChildren(this.props.children);
 
-    if (defaultActiveKey == null) {
-      var children = this.props.children;
-      defaultActiveKey =
-        Array.isArray(children) ? children[0].props.key : children.props.key;
-    }
+    // TODO: In __DEV__ mode warn via `console.warn` if no `defaultActiveKey` has
+    // been set by this point, invalid children or missing key properties are likely the cause.
 
     return {
       activeKey: defaultActiveKey,
@@ -58,9 +67,13 @@ var TabbedArea = React.createClass({displayName: 'TabbedArea',
     var activeKey =
       this.props.activeKey != null ? this.props.activeKey : this.state.activeKey;
 
+    function renderTabIfSet(child) {
+      return child.props.tab != null ? this.renderTab(child) : null;
+    }
+
     var nav = this.transferPropsTo(
-      Nav( {bsStyle:"tabs", activeKey:activeKey, onSelect:this.handleSelect, ref:"tabs"}, 
-          utils.modifyChildren(utils.filterChildren(this.props.children, hasTab), this.renderTab)
+      Nav( {activeKey:activeKey, onSelect:this.handleSelect, ref:"tabs"}, 
+        ValidComponentChildren.map(this.props.children, renderTabIfSet, this)
       )
     );
 
@@ -68,7 +81,7 @@ var TabbedArea = React.createClass({displayName: 'TabbedArea',
       React.DOM.div(null, 
         nav,
         React.DOM.div( {id:this.props.id, className:"tab-content", ref:"panes"}, 
-          utils.modifyChildren(this.props.children, this.renderPane)
+          ValidComponentChildren.map(this.props.children, this.renderPane)
         )
       )
     );

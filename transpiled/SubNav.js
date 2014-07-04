@@ -5,6 +5,7 @@ var React = require("./react-es6")["default"];
 var classSet = require("./react-es6/lib/cx")["default"];
 var BootstrapMixin = require("./BootstrapMixin")["default"];
 var utils = require("./utils")["default"];
+var ValidComponentChildren = require("./ValidComponentChildren")["default"];
 
 
 var SubNav = React.createClass({displayName: 'SubNav',
@@ -40,8 +41,6 @@ var SubNav = React.createClass({displayName: 'SubNav',
   },
 
   isChildActive: function (child) {
-    var isActive = false;
-
     if (child.props.active) {
       return true;
     }
@@ -55,7 +54,9 @@ var SubNav = React.createClass({displayName: 'SubNav',
     }
 
     if (child.props.children) {
-      React.Children.forEach(
+      var isActive = false;
+
+      ValidComponentChildren.forEach(
         child.props.children,
         function (child) {
           if (this.isChildActive(child)) {
@@ -105,7 +106,7 @@ var SubNav = React.createClass({displayName: 'SubNav',
           this.props.text
         ),
         React.DOM.ul( {className:"nav"}, 
-          utils.modifyChildren(this.props.children, this.renderNavItem)
+          ValidComponentChildren.map(this.props.children, this.renderNavItem)
         )
       )
     );

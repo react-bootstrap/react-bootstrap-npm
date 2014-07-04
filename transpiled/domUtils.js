@@ -5,6 +5,10 @@ exports["default"] = {
   },
 
   getOffset: function (DOMNode) {
+    if (window.jQuery) {
+      return window.jQuery(DOMNode).offset();
+    }
+
     var docElem = document.documentElement;
     var box = { top: 0, left: 0 };
 
@@ -21,6 +25,10 @@ exports["default"] = {
   },
 
   getPosition: function (elem, offsetParent) {
+    if (window.jQuery) {
+      return window.jQuery(elem).position();
+    }
+
     var offset,
         parentOffset = {top: 0, left: 0};
 

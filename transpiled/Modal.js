@@ -5,6 +5,7 @@ var React = require("./react-es6")["default"];
 var classSet = require("./react-es6/lib/cx")["default"];
 var BootstrapMixin = require("./BootstrapMixin")["default"];
 var FadeMixin = require("./FadeMixin")["default"];
+var EventListener = require("./react-es6/lib/EventListener")["default"];
 
 
 // TODO:
@@ -36,10 +37,15 @@ var Modal = React.createClass({displayName: 'Modal',
 
   render: function () {
     var modalStyle = {display: 'block'};
-    var classes = this.getBsClassSet();
+    var dialogClasses = this.getBsClassSet();
+    delete dialogClasses.modal;
+    dialogClasses['modal-dialog'] = true;
 
-    classes['fade'] = this.props.animation;
-    classes['in'] = !this.props.animation || !document.querySelectorAll;
+    var classes = {
+      modal: true,
+      fade: this.props.animation,
+      'in': !this.props.animation || !document.querySelectorAll
+    };
 
     var modal = this.transferPropsTo(
       React.DOM.div(
@@ -50,7 +56,7 @@ var Modal = React.createClass({displayName: 'Modal',
         className:classSet(classes),
         onClick:this.props.backdrop === true ? this.handleBackdropClick : null,
         ref:"modal"}, 
-        React.DOM.div( {className:"modal-dialog"}, 
+        React.DOM.div( {className:classSet(dialogClasses)}, 
           React.DOM.div( {className:"modal-content"}, 
             this.props.title ? this.renderHeader() : null,
             this.props.children
@@ -106,11 +112,12 @@ var Modal = React.createClass({displayName: 'Modal',
   },
 
   componentDidMount: function () {
-    document.addEventListener('keyup', this.handleDocumentKeyUp);
+    this._onDocumentKeyupListener =
+      EventListener.listen(document, 'keyup', this.handleDocumentKeyUp);
   },
 
   componentWillUnmount: function () {
-    document.removeEventListener('keyup', this.handleDocumentKeyUp);
+    this._onDocumentKeyupListener.remove();
   },
 
   handleBackdropClick: function (e) {

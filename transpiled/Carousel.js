@@ -5,6 +5,7 @@ var React = require("./react-es6")["default"];
 var classSet = require("./react-es6/lib/cx")["default"];
 var BootstrapMixin = require("./BootstrapMixin")["default"];
 var utils = require("./utils")["default"];
+var ValidComponentChildren = require("./ValidComponentChildren")["default"];
 
 var Carousel = React.createClass({displayName: 'Carousel',
   mixins: [BootstrapMixin],
@@ -16,7 +17,9 @@ var Carousel = React.createClass({displayName: 'Carousel',
     pauseOnHover: React.PropTypes.bool,
     wrap: React.PropTypes.bool,
     onSelect: React.PropTypes.func,
+    onSlideEnd: React.PropTypes.func,
     activeIndex: React.PropTypes.number,
+    defaultActiveIndex: React.PropTypes.number,
     direction: React.PropTypes.oneOf(['prev', 'next'])
   },
 
@@ -32,14 +35,9 @@ var Carousel = React.createClass({displayName: 'Carousel',
   },
 
   getInitialState: function () {
-    var defaultActiveIndex = this.props.defaultActiveIndex;
-
-    if (defaultActiveIndex == null) {
-      defaultActiveIndex = 0;
-    }
-
     return {
-      activeIndex: defaultActiveIndex,
+      activeIndex: this.props.defaultActiveIndex == null ?
+        0 : this.props.defaultActiveIndex,
       previousActiveIndex: null,
       direction: null
     };
@@ -54,22 +52,11 @@ var Carousel = React.createClass({displayName: 'Carousel',
       'prev' : 'next';
   },
 
-  getNumberOfItems: function () {
-    if (!this.props.children) {
-      return 0;
-    }
-
-    if (!Array.isArray(this.props.children)) {
-      return 1;
-    }
-
-    return this.props.children.length;
-  },
-
   componentWillReceiveProps: function (nextProps) {
     var activeIndex = this.getActiveIndex();
 
     if (nextProps.activeIndex != null && nextProps.activeIndex !== activeIndex) {
+      clearTimeout(this.timeout);
       this.setState({
         previousActiveIndex: activeIndex,
         direction: nextProps.direction != null ?
@@ -82,10 +69,19 @@ var Carousel = React.createClass({displayName: 'Carousel',
     this.waitForNext();
   },
 
-  next: function (e) {
-    var index = this.getActiveIndex() + 1;
+  componentWillUnmount: function() {
+    clearTimeout(this.timeout);
+  },
 
-    if (index > this.getNumberOfItems() - 1) {
+  next: function (e) {
+    if (e) {
+      e.preventDefault();
+    }
+
+    var index = this.getActiveIndex() + 1;
+    var count = ValidComponentChildren.numberOf(this.props.children);
+
+    if (index > count - 1) {
       if (!this.props.wrap) {
         return;
       }
@@ -93,27 +89,23 @@ var Carousel = React.createClass({displayName: 'Carousel',
     }
 
     this.handleSelect(index, 'next');
-
-    if (e) {
-      e.preventDefault();
-    }
   },
 
   prev: function (e) {
+    if (e) {
+      e.preventDefault();
+    }
+
     var index = this.getActiveIndex() - 1;
 
     if (index < 0) {
       if (!this.props.wrap) {
         return;
       }
-      index = this.getNumberOfItems() - 1;
+      index = ValidComponentChildren.numberOf(this.props.children) - 1;
     }
 
     this.handleSelect(index, 'prev');
-
-    if (e) {
-      e.preventDefault();
-    }
   },
 
   pause: function () {
@@ -158,7 +150,7 @@ var Carousel = React.createClass({displayName: 'Carousel',
         onMouseOut:this.handleMouseOut}, 
         this.props.indicators ? this.renderIndicators() : null,
         React.DOM.div( {className:"carousel-inner", ref:"inner"}, 
-          utils.modifyChildren(this.props.children, this.renderItem)
+          ValidComponentChildren.map(this.props.children, this.renderItem)
         ),
         this.props.controls ? this.renderControls() : null
       )
@@ -166,60 +158,66 @@ var Carousel = React.createClass({displayName: 'Carousel',
   },
 
   renderPrev: function () {
-    var href = '#';
-
-    if (this.props.id) {
-      href += this.props.id;
-    }
-
     return (
-      React.DOM.a( {className:"left carousel-control", href:href, key:0, onClick:this.prev}, 
-        React.DOM.span( {className:"glyphicon glyphicon-chevron-left"})
+      React.DOM.a( {className:"left carousel-control", href:"#prev", key:0, onClick:this.prev}, 
+        React.DOM.span( {className:"glyphicon glyphicon-chevron-left"} )
       )
     );
   },
 
   renderNext: function () {
-    var href = '#';
-
-    if (this.props.id) {
-      href += this.props.id;
-    }
-
     return (
-      React.DOM.a( {className:"right carousel-control", href:href, key:1, onClick:this.next}, 
+      React.DOM.a( {className:"right carousel-control", href:"#next", key:1, onClick:this.next}, 
         React.DOM.span( {className:"glyphicon glyphicon-chevron-right"})
       )
     );
   },
 
   renderControls: function () {
-    var activeIndex = this.getActiveIndex();
+    if (this.props.wrap) {
+      var activeIndex = this.getActiveIndex();
+      var count = ValidComponentChildren.numberOf(this.props.children);
+
+      return [
+        (activeIndex !== 0) ? this.renderPrev() : null,
+        (activeIndex !== count - 1) ? this.renderNext() : null
+      ];
+    }
 
     return [
-      (this.props.wrap || activeIndex !== 0) ? this.renderPrev() : null,
-      (this.props.wrap || activeIndex !== this.getNumberOfItems() - 1) ?
-        this.renderNext() : null
+      this.renderPrev(),
+      this.renderNext()
     ];
   },
 
-  renderIndicator: function (child, i) {
-    var className = (i === this.getActiveIndex()) ?
+  renderIndicator: function (child, index) {
+    var className = (index === this.getActiveIndex()) ?
       'active' : null;
 
-    return [
+    return (
       React.DOM.li(
-        {key:i,
+        {key:index,
         className:className,
-        onClick:this.handleSelect.bind(this, i, null)} ),
-      ' '
-    ];
+        onClick:this.handleSelect.bind(this, index, null)} )
+    );
   },
 
   renderIndicators: function () {
+    var indicators = [];
+    ValidComponentChildren
+      .forEach(this.props.children, function(child, index) {
+        indicators.push(
+          this.renderIndicator(child, index),
+
+          // Force whitespace between indicator elements, bootstrap
+          // requires this for correct spacing of elements.
+          ' '
+        );
+      }, this);
+
     return (
       React.DOM.ol( {className:"carousel-indicators"}, 
-        utils.modifyChildren(this.props.children, this.renderIndicator)
+        indicators
       )
     );
   },
@@ -229,21 +227,23 @@ var Carousel = React.createClass({displayName: 'Carousel',
   },
 
   handleItemAnimateOutEnd: function () {
-    this.sliding = false;
-
     this.setState({
       previousActiveIndex: null,
       direction: null
-    });
+    }, function() {
+      this.waitForNext();
 
-    this.waitForNext();
+      if (this.props.onSlideEnd) {
+        this.props.onSlideEnd();
+      }
+    });
   },
 
-  renderItem: function (child, i) {
-    var activeIndex = this.getActiveIndex(),
-        isActive = (i === activeIndex),
-        isPreviousActive = this.state.previousActiveIndex != null &&
-            this.state.previousActiveIndex === i && this.props.slide;
+  renderItem: function (child, index) {
+    var activeIndex = this.getActiveIndex();
+    var isActive = (index === activeIndex);
+    var isPreviousActive = this.state.previousActiveIndex != null &&
+            this.state.previousActiveIndex === index && this.props.slide;
 
     return utils.cloneWithProps(
         child,
@@ -251,8 +251,8 @@ var Carousel = React.createClass({displayName: 'Carousel',
           active: isActive,
           ref: child.props.ref,
           key: child.props.key != null ?
-            child.props.key : i,
-          index: i,
+            child.props.key : index,
+          index: index,
           animateOut: isPreviousActive,
           animateIn: isActive && this.state.previousActiveIndex != null && this.props.slide,
           direction: this.state.direction,
@@ -261,37 +261,29 @@ var Carousel = React.createClass({displayName: 'Carousel',
       );
   },
 
-  shouldComponentUpdate: function() {
-    // Defer any updates to this component during the `onSelect` handler.
-    return !this._isChanging;
-  },
-
   handleSelect: function (index, direction) {
-    var previousActiveIndex;
+    clearTimeout(this.timeout);
 
-    if (this.sliding) {
-      return;
-    }
-
-    this.sliding = true;
+    var previousActiveIndex = this.getActiveIndex();
+    direction = direction || this.getDirection(previousActiveIndex, index);
 
     if (this.props.onSelect) {
-      this._isChanging = true;
       this.props.onSelect(index, direction);
-      this._isChanging = false;
     }
 
-    if (this.props.activeIndex == null && index !== this.getActiveIndex()) {
-      previousActiveIndex = this.getActiveIndex();
+    if (this.props.activeIndex == null && index !== previousActiveIndex) {
+      if (this.state.previousActiveIndex != null) {
+        // If currently animating don't activate the new index.
+        // TODO: look into queuing this canceled call and
+        // animating after the current animation has ended.
+        return;
+      }
+
       this.setState({
         activeIndex: index,
         previousActiveIndex: previousActiveIndex,
-        direction: direction || this.getDirection(previousActiveIndex, index)
+        direction: direction
       });
-
-      if (!this.props.slide) {
-        this.waitForNext();
-      }
     }
   }
 });

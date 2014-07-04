@@ -4,6 +4,7 @@
 var React = require("./react-es6")["default"];
 var classSet = require("./react-es6/lib/cx")["default"];
 var utils = require("./utils")["default"];
+var ValidComponentChildren = require("./ValidComponentChildren")["default"];
 
 var DropdownMenu = React.createClass({displayName: 'DropdownMenu',
   propTypes: {
@@ -21,7 +22,7 @@ var DropdownMenu = React.createClass({displayName: 'DropdownMenu',
         React.DOM.ul(
           {className:classSet(classes),
           role:"menu"}, 
-          utils.modifyChildren(this.props.children, this.renderMenuItem)
+          ValidComponentChildren.map(this.props.children, this.renderMenuItem)
         )
       );
   },

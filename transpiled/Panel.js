@@ -3,7 +3,6 @@
 
 var React = require("./react-es6")["default"];
 var classSet = require("./react-es6/lib/cx")["default"];
-var ReactTransitionEvents = require("./react-es6/lib/ReactTransitionEvents")["default"];
 var BootstrapMixin = require("./BootstrapMixin")["default"];
 var CollapsableMixin = require("./CollapsableMixin")["default"];
 var utils = require("./utils")["default"];
@@ -14,8 +13,6 @@ var Panel = React.createClass({displayName: 'Panel',
   propTypes: {
     header: React.PropTypes.renderable,
     footer: React.PropTypes.renderable,
-    isCollapsable: React.PropTypes.bool,
-    isOpen: React.PropTypes.bool,
     onClick: React.PropTypes.func
   },
 
@@ -36,7 +33,7 @@ var Panel = React.createClass({displayName: 'Panel',
     e.preventDefault();
 
     this.setState({
-      isOpen: !this.state.isOpen
+      expanded: !this.state.expanded
     });
   },
 
@@ -60,10 +57,10 @@ var Panel = React.createClass({displayName: 'Panel',
     var classes = this.getBsClassSet();
     classes['panel'] = true;
 
-    return (
-      React.DOM.div( {className:classSet(classes), id:this.props.isCollapsable ? null : this.props.id}, 
+    return this.transferPropsTo(
+      React.DOM.div( {className:classSet(classes), id:this.props.collapsable ? null : this.props.id}, 
         this.renderHeading(),
-        this.props.isCollapsable ? this.renderCollapsableBody() : this.renderBody(),
+        this.props.collapsable ? this.renderCollapsableBody() : this.renderBody(),
         this.renderFooter()
       )
     );
@@ -93,9 +90,9 @@ var Panel = React.createClass({displayName: 'Panel',
     }
 
     if (!React.isValidComponent(header) || Array.isArray(header)) {
-      header = this.props.isCollapsable ?
+      header = this.props.collapsable ?
         this.renderCollapsableTitle(header) : header;
-    } else if (this.props.isCollapsable) {
+    } else if (this.props.collapsable) {
       header = utils.cloneWithProps(header, {
         className: 'panel-title',
         children: this.renderAnchor(header.props.children)
@@ -117,7 +114,7 @@ var Panel = React.createClass({displayName: 'Panel',
     return (
       React.DOM.a(
         {href:'#' + (this.props.id || ''),
-        className:this.isOpen() ? null : 'collapsed',
+        className:this.isExpanded() ? null : 'collapsed',
         onClick:this.handleSelect}, 
         header
       )

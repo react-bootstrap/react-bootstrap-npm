@@ -8,8 +8,8 @@ var Accordion = React.createClass({displayName: 'Accordion',
 
   render: function () {
     return this.transferPropsTo(
-      PanelGroup( {isAccordion:true}, 
-          this.props.children
+      PanelGroup( {accordion:true}, 
+        this.props.children
       )
     );
   }

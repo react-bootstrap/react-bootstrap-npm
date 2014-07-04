@@ -6,6 +6,7 @@ var classSet = require("./react-es6/lib/cx")["default"];
 var Interpolate = require("./Interpolate")["default"];
 var BootstrapMixin = require("./BootstrapMixin")["default"];
 var utils = require("./utils")["default"];
+var ValidComponentChildren = require("./ValidComponentChildren")["default"];
 
 
 var ProgressBar = React.createClass({displayName: 'ProgressBar',
@@ -13,7 +14,7 @@ var ProgressBar = React.createClass({displayName: 'ProgressBar',
     min: React.PropTypes.number,
     now: React.PropTypes.number,
     max: React.PropTypes.number,
-    label: React.PropTypes.string,
+    label: React.PropTypes.renderable,
     srOnly: React.PropTypes.bool,
     striped: React.PropTypes.bool,
     active: React.PropTypes.bool
@@ -45,7 +46,7 @@ var ProgressBar = React.createClass({displayName: 'ProgressBar',
       classes['progress-striped'] = true;
     }
 
-    if (!this.props.children) {
+    if (!ValidComponentChildren.hasValidComponent(this.props.children)) {
       if (!this.props.isChild) {
         return this.transferPropsTo(
           React.DOM.div( {className:classSet(classes)}, 
@@ -60,7 +61,7 @@ var ProgressBar = React.createClass({displayName: 'ProgressBar',
     } else {
       return this.transferPropsTo(
         React.DOM.div( {className:classSet(classes)}, 
-          utils.modifyChildren(this.props.children, this.renderChildBar)
+          ValidComponentChildren.map(this.props.children, this.renderChildBar)
         )
       );
     }
@@ -83,9 +84,14 @@ var ProgressBar = React.createClass({displayName: 'ProgressBar',
 
     var label;
 
-    if (this.props.label) {
-      label = this.props.srOnly ?
-        this.renderScreenReaderOnlyLabel(percentage) : this.renderLabel(percentage);
+    if (typeof this.props.label === "string") {
+      label = this.renderLabel(percentage);
+    } else if (this.props.label) {
+      label = this.props.label;
+    }
+
+    if (this.props.srOnly) {
+      label = this.renderScreenReaderOnlyLabel(label);
     }
 
     return (
@@ -114,10 +120,10 @@ var ProgressBar = React.createClass({displayName: 'ProgressBar',
     );
   },
 
-  renderScreenReaderOnlyLabel: function (percentage) {
+  renderScreenReaderOnlyLabel: function (label) {
     return (
       React.DOM.span( {className:"sr-only"}, 
-        this.renderLabel(percentage)
+        label
       )
     );
   }

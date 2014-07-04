@@ -7,6 +7,7 @@ var BootstrapMixin = require("./BootstrapMixin")["default"];
 var PropTypes = require("./PropTypes")["default"];
 var utils = require("./utils")["default"];
 var Nav = require("./Nav")["default"];
+var ValidComponentChildren = require("./ValidComponentChildren")["default"];
 
 
 var Navbar = React.createClass({displayName: 'Navbar',
@@ -17,12 +18,14 @@ var Navbar = React.createClass({displayName: 'Navbar',
     fixedBottom: React.PropTypes.bool,
     staticTop: React.PropTypes.bool,
     inverse: React.PropTypes.bool,
+    fluid: React.PropTypes.bool,
     role: React.PropTypes.string,
     componentClass: PropTypes.componentClass,
     brand: React.PropTypes.renderable,
     toggleButton: React.PropTypes.renderable,
     onToggle: React.PropTypes.func,
-    fluid: React.PropTypes.func
+    navExpanded: React.PropTypes.bool,
+    defaultNavExpanded: React.PropTypes.bool
   },
 
   getDefaultProps: function () {
@@ -36,7 +39,7 @@ var Navbar = React.createClass({displayName: 'Navbar',
 
   getInitialState: function () {
     return {
-      navOpen: this.props.defaultNavOpen
+      navExpanded: this.props.defaultNavExpanded
     };
   },
 
@@ -74,7 +77,7 @@ var Navbar = React.createClass({displayName: 'Navbar',
       componentClass( {className:classSet(classes)}, 
         React.DOM.div( {className:this.props.fluid ? 'container-fluid' : 'container'}, 
           (this.props.brand || this.props.toggleButton || this.props.toggleNavKey) ? this.renderHeader() : null,
-          React.Children.map(this.props.children, this.renderChild)
+          ValidComponentChildren.map(this.props.children, this.renderChild)
         )
       )
     );

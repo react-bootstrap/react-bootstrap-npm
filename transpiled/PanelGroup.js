@@ -5,11 +5,15 @@ var React = require("./react-es6")["default"];
 var classSet = require("./react-es6/lib/cx")["default"];
 var BootstrapMixin = require("./BootstrapMixin")["default"];
 var utils = require("./utils")["default"];
+var ValidComponentChildren = require("./ValidComponentChildren")["default"];
 
 var PanelGroup = React.createClass({displayName: 'PanelGroup',
   mixins: [BootstrapMixin],
 
   propTypes: {
+    collapsable: React.PropTypes.bool,
+    activeKey: React.PropTypes.any,
+    defaultActiveKey: React.PropTypes.any,
     onSelect: React.PropTypes.func
   },
 
@@ -30,7 +34,7 @@ var PanelGroup = React.createClass({displayName: 'PanelGroup',
   render: function () {
     return this.transferPropsTo(
       React.DOM.div( {className:classSet(this.getBsClassSet())}, 
-          utils.modifyChildren(this.props.children, this.renderPanel)
+        ValidComponentChildren.map(this.props.children, this.renderPanel)
       )
     );
   },
@@ -40,14 +44,14 @@ var PanelGroup = React.createClass({displayName: 'PanelGroup',
       this.props.activeKey != null ? this.props.activeKey : this.state.activeKey;
 
     var props = {
-      bsStyle: this.props.bsStyle,
+      bsStyle: child.props.bsStyle || this.props.bsStyle,
       key: child.props.key,
       ref: child.props.ref
     };
 
-    if (this.props.isAccordion) {
-      props.isCollapsable = true;
-      props.isOpen = (child.props.key === activeKey);
+    if (this.props.accordion) {
+      props.collapsable = true;
+      props.expanded = (child.props.key === activeKey);
       props.onSelect = this.handleSelect;
     }
 

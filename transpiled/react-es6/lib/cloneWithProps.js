@@ -25,7 +25,8 @@ function cloneWithProps (child, props) {
     newProps.children = child.props.children;
   }
 
-  return child.constructor.ConvenienceConstructor(newProps);
+  return child.constructor.ConvenienceConstructor ?
+    child.constructor.ConvenienceConstructor(newProps) : child.constructor(newProps);
 }
 
 exports["default"] = cloneWithProps;

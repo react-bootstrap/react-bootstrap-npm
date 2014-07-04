@@ -7,6 +7,7 @@ var BootstrapMixin = require("./BootstrapMixin")["default"];
 var CollapsableMixin = require("./CollapsableMixin")["default"];
 var utils = require("./utils")["default"];
 var domUtils = require("./domUtils")["default"];
+var ValidComponentChildren = require("./ValidComponentChildren")["default"];
 
 
 var Nav = React.createClass({displayName: 'Nav',
@@ -45,8 +46,8 @@ var Nav = React.createClass({displayName: 'Nav',
 
     classes['navbar-collapse'] = this.props.isCollapsable;
 
-    if (this.props.navbar) {
-      return this.renderUl();
+    if (this.props.navbar && !this.props.isCollapsable) {
+      return this.transferPropsTo(this.renderUl());
     }
 
     return this.transferPropsTo(
@@ -65,7 +66,7 @@ var Nav = React.createClass({displayName: 'Nav',
 
     return (
       React.DOM.ul( {className:classSet(classes), ref:"ul"}, 
-        utils.modifyChildren(this.props.children, this.renderNavItem)
+        ValidComponentChildren.map(this.props.children, this.renderNavItem)
       )
     );
   },

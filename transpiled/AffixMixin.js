@@ -3,6 +3,7 @@
 
 var React = require("./react-es6")["default"];
 var domUtils = require("./domUtils")["default"];
+var EventListener = require("./react-es6/lib/EventListener")["default"];
 
 var AffixMixin = {
   propTypes: {
@@ -105,13 +106,20 @@ var AffixMixin = {
   },
 
   componentDidMount: function () {
-    window.addEventListener('scroll', this.checkPosition);
-    document.addEventListener('click', this.checkPositionWithEventLoop);
+    this._onWindowScrollListener =
+      EventListener.listen(window, 'scroll', this.checkPosition);
+    this._onDocumentClickListener =
+      EventListener.listen(document, 'click', this.checkPositionWithEventLoop);
   },
 
   componentWillUnmount: function () {
-    window.removeEventListener('scroll', this.checkPosition);
-    document.addEventListener('click', this.checkPositionWithEventLoop);
+    if (this._onWindowScrollListener) {
+      this._onWindowScrollListener.remove();
+    }
+
+    if (this._onDocumentClickListener) {
+      this._onDocumentClickListener.remove();
+    }
   },
 
   componentDidUpdate: function (prevProps, prevState) {

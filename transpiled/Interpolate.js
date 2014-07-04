@@ -5,6 +5,7 @@
 var React = require("./react-es6")["default"];
 var invariant = require("./react-es6/lib/invariant")["default"];
 var utils = require("./utils")["default"];
+var ValidComponentChildren = require("./ValidComponentChildren")["default"];
 
 function isString(object) {
   return Object.prototype.toString.call(object) === '[object String]';
@@ -20,7 +21,7 @@ var Interpolate = React.createClass({
   },
 
   render: function() {
-    var format = this.props.children || this.props.format;
+    var format = ValidComponentChildren.hasValidComponent(this.props.children) ? this.props.children : this.props.format;
     var parent = this.props.component;
     var unsafe = this.props.unsafe === true;
     var props  = utils.extend({}, this.props);
