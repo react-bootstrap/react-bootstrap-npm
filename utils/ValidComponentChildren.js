@@ -1,6 +1,4 @@
-"use strict";
-var React = require("./react-es6")["default"];
-
+var React = require('react');
 
 /**
  * Maps children that are typically specified as `props.children`,
@@ -84,7 +82,7 @@ function hasValidComponent(children) {
   return hasValid;
 }
 
-exports["default"] = {
+module.exports = {
   map: mapValidComponents,
   forEach: forEachValidComponents,
   numberOf: numberOfValidComponents,
