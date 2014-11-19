@@ -1,10 +1,12 @@
 {
   "name": "react-bootstrap",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Bootstrap 3 components build with React",
+  "homepage": "http://react-bootstrap.github.io/",
   "main": "main.js",
   "keywords": [
     "react",
+    "ecosystem-react",
     "react-component",
     "bootstrap"
   ],
@@ -18,6 +20,6 @@
     "url": "https://github.com/react-bootstrap/react-bootstrap/issues"
   },
   "peerDependencies": {
-    "react": ">=0.9"
+    "react": ">=0.12"
   }
 }
