@@ -1,7 +1,7 @@
 var React = require('react');
 var joinClasses = require('./utils/joinClasses');
 
-var PageHeader = React.createClass({displayName: 'PageHeader',
+var PageHeader = React.createClass({displayName: "PageHeader",
 
   render: function () {
     return (
