@@ -1,5 +1,10 @@
 # react-bootstrap-npm
 
+## This repo is now obsolete.
+
+_See react-bootstrap/react-bootstrap#326_ We now publish directly from the
+source repo.
+
 [Bootstrap 3](http://getbootstrap.com) components built with [React](http://facebook.github.io/react/)
 
 This repo contains built CommonJS modules for Node.js.
